@@ -1,41 +1,63 @@
-import './App.css';
+import './style.css';
 import React, { useEffect, useState,useRef } from 'react';
 
 
 function App() {
   const fileUpload = " ";
-  const [number, setNumber] = useState(0);
-  const [container, setContainer] = useState([]);
+  const [todos, setTodos] = useState([]);
   const [input, setInput] = useState("");
+
+  // function that handles push input to array
   const handleClick = event => {
     event.preventDefault();
      const value = {
       id: Math.random() + 1,
       inputObject: input
     }
-    setContainer([...container, value]);
+    setTodos([...todos, value]);
 
    
     setInput(''); 
   };
 
-  const uploadedFile = event =>
-  {
-    fileUpload = event.target.files;
+  //if input is populated sets input 
+  const handleOnchange = event => {
+    setInput(event.target.value);
+  } 
+  
+  //remove a given div
+  const removeDiv = (id) => {
+    let newArrayFiltered = todos.filter((item) => item.id != id);
+    setTodos([...newArrayFiltered]);
   }
 
-  useEffect(() => { 
-  console.log("hello");
-  
-},[number]);
+
   return (
     <div className="App">
       <form>
-        <input type="file" name="filename" ref= {fileUpload }></input>
-        <input type="submit " onChange={uploadedFile}></input>
+        <input onChange={handleOnchange} value={input} type="text" placeholder="Input todo"></input>
+        <button onClick={handleClick} disabled={!input}> add</button>
+
+        {todos.map(todo => {
+          return (
+            <div className="todoContainer" key={todo.id}>
+              <div>
+                <h1 >
+                {todo.inputObject}
+                </h1>
+              </div>
+              <div>
+                <button onClick={(event) => {
+                  event.preventDefault();
+                  removeDiv(todo.id)
+                }}>Delete</button>
+              </div>
+           </div>
+          )
+        }
+        )}
       </form>
 
-      {console.log(fileUpload.files)}
     </div>
 
   );
