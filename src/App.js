@@ -3,61 +3,48 @@ import React, { useEffect, useState,useRef } from 'react';
 
 
 function App() {
-  const fileUpload = " ";
-  const [todos, setTodos] = useState([]);
-  const [input, setInput] = useState("");
+  const [search, setSearch] = useState('');
+  const [queries, setQueries] = useState('');
+  const [results, setResults] = useState([]);
 
-  // function that handles push input to array
-  const handleClick = event => {
-    event.preventDefault();
-     const value = {
-      id: Math.random() + 1,
-      inputObject: input
+  useEffect(() => {
+    async function fetchData() {
+      try{
+        const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=Hbmdx3l0uron0KM14HOgCdScLelDP860&q=${queries}&limit=25&offset=0&rating=pg&lang=en`);
+        const json = await response.json();
+    
+        setResults(json.data.map(item => {
+          return item.images.preview.mp4;
+         })
+        );
+
+      }
+      catch(err){}
     }
-    setTodos([...todos, value]);
 
-   
-    setInput(''); 
-  };
-
-  //if input is populated sets input 
-  const handleOnchange = event => {
-    setInput(event.target.value);
-  } 
-  
-  //remove a given div
-  const removeDiv = (id) => {
-    let newArrayFiltered = todos.filter((item) => item.id != id);
-    setTodos([...newArrayFiltered]);
-  }
-
-
+    fetchData();
+  }, [queries])
   return (
     <div className="App">
       <form>
-        <input onChange={handleOnchange} value={input} type="text" placeholder="Input todo"></input>
-        <button onClick={handleClick} disabled={!input}> add</button>
 
-        {todos.map(todo => {
-          return (
-            <div className="todoContainer" key={todo.id}>
-              <div>
-                <h1 >
-                {todo.inputObject}
-                </h1>
-              </div>
-              <div>
-                <button onClick={(event) => {
-                  event.preventDefault();
-                  removeDiv(todo.id)
-                }}>Delete</button>
-              </div>
-           </div>
-          )
-        }
-        )}
+        <input value={search} type="text" onChange={event => { 
+          setSearch(event.target.value);
+         }}></input>
+
+        <button type="submit" onClick={event => {
+          event.preventDefault();
+          setQueries(search);
+          
+        }}>Search</button>
       </form>
+      {
+        results.map(result => (
+          <video autoplay loop key={result} src={result}/>
 
+        ))
+        
+      }
     </div>
 
   );
